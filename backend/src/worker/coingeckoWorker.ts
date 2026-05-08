@@ -4,12 +4,20 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
+import { io } from 'socket.io-client';
 
 dotenv.config();
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
+
+// Connect to our backend server via Socket.io
+const socket = io('http://localhost:4000');
+
+socket.on('connect', () => {
+  console.log('Worker connected to Socket.io server');
+});
 
 // The 10 coins we want to track
 const COIN_IDS = [
@@ -46,6 +54,9 @@ cron.schedule('*/10 * * * * *', async () => {
     }
     
     console.log(`[${new Date().toISOString()}] Successfully saved prices for ${savedCount} coins.`);
+
+    // Broadcast the new prices to the server via WebSockets
+    socket.emit('workerUpdate', data);
   } catch (error: any) {
     console.error('Error fetching from CoinGecko:', error.message);
   }
