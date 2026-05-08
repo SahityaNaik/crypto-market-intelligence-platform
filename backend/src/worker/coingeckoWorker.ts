@@ -1,16 +1,11 @@
 import cron from 'node-cron';
 import axios from 'axios';
-import { Pool } from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma.js';
 import dotenv from 'dotenv';
 import { io } from 'socket.io-client';
 
 dotenv.config();
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 // Connect to our backend server via Socket.io
 const socket = io('http://localhost:4000');
