@@ -73,7 +73,7 @@ const PriceCard: React.FC<PriceCardProps> = ({ coinId, price, change24h, sparkli
       </div>
 
       {/* Sparkline Chart */}
-      <div className="flex-1 h-16 mt-4 -mx-2">
+      <div className="h-16 min-h-[64px] mt-4 -mx-2 relative">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>

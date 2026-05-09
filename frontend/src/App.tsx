@@ -3,6 +3,7 @@ import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import Portfolio from './pages/Portfolio';
 import Alerts from './pages/Alerts';
+import Analytics from './pages/Analytics';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -84,11 +85,10 @@ function App() {
               </MainLayout>
             </ProtectedRoute>
           } />
-
           <Route path="/analytics" element={
             <ProtectedRoute>
               <MainLayout>
-                <div className="text-white text-2xl font-bold">Analytics Feature (Phase 8)</div>
+                <Analytics />
               </MainLayout>
             </ProtectedRoute>
           } />

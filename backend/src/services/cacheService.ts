@@ -1,6 +1,8 @@
 interface PriceData {
   [coinId: string]: {
     usd: number;
+    change24h: number;
+    sparkline: number[];
     lastUpdated: string;
   }
 }
@@ -23,6 +25,8 @@ class CacheService {
     Object.keys(data).forEach(coinId => {
       this.prices[coinId] = {
         usd: data[coinId].usd,
+        change24h: data[coinId].change24h,
+        sparkline: data[coinId].sparkline,
         lastUpdated: timestamp
       };
     });
