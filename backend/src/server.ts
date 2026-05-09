@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import { prisma } from './lib/prisma.js';
 import { cacheService } from './services/cacheService.js';
 import authRoutes from './routes/authRoutes.js';
+import portfolioRoutes from './routes/portfolioRoutes.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/portfolio', portfolioRoutes);
 
 // Simple logging middleware
 app.use((req, res, next) => {

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
+import Portfolio from './pages/Portfolio';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -27,7 +28,7 @@ function App() {
           <Route path="/portfolio" element={
             <ProtectedRoute>
               <MainLayout>
-                <div className="text-white text-2xl font-bold">Portfolio Feature (Phase 6)</div>
+                <Portfolio />
               </MainLayout>
             </ProtectedRoute>
           } />
