@@ -7,6 +7,7 @@ import { prisma } from './lib/prisma.js';
 import { cacheService } from './services/cacheService.js';
 import authRoutes from './routes/authRoutes.js';
 import portfolioRoutes from './routes/portfolioRoutes.js';
+import alertRoutes from './routes/alertRoutes.js';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/alerts', alertRoutes);
 
 // Simple logging middleware
 app.use((req, res, next) => {
@@ -38,18 +40,60 @@ app.use((req, res, next) => {
   next();
 });
 
+// Alert checking engine
+const checkAlerts = async (data: any) => {
+  try {
+    const activeAlerts = await prisma.alert.findMany({
+      where: { isActive: true }
+    });
+
+    for (const alert of activeAlerts) {
+      const currentPrice = data[alert.coinId]?.usd;
+      if (!currentPrice) continue;
+
+      let triggered = false;
+      if (alert.condition === 'above' && currentPrice >= alert.targetPrice) triggered = true;
+      if (alert.condition === 'below' && currentPrice <= alert.targetPrice) triggered = true;
+
+      if (triggered) {
+        console.log(`[Alert] Triggered for user ${alert.userId}: ${alert.coinId} is ${alert.condition} ${alert.targetPrice}`);
+        
+        // 1. Mark as triggered
+        await prisma.alert.update({
+          where: { id: alert.id },
+          data: { isActive: false, triggeredAt: new Date() }
+        });
+
+        // 2. Broadcast to the user
+        io.emit(`alertTriggered:${alert.userId}`, {
+          id: alert.id,
+          coinId: alert.coinId,
+          price: currentPrice,
+          condition: alert.condition,
+          targetPrice: alert.targetPrice
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Error checking alerts:', err);
+  }
+};
+
 // Socket.io connection logic
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
   // Listen for price updates from the worker
-  socket.on('workerUpdate', (data) => {
+  socket.on('workerUpdate', async (data) => {
     console.log(`[Socket] Received prices from worker. Updating cache and broadcasting...`);
     
     // 1. Update the in-memory cache
     cacheService.setPrices(data);
     
-    // 2. Broadcast the new prices to all connected frontend clients
+    // 2. Check for triggered alerts
+    await checkAlerts(data);
+    
+    // 3. Broadcast the new prices to all connected frontend clients
     io.emit('priceUpdate', data);
   });
 
