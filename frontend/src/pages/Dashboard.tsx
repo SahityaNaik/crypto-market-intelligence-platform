@@ -1,4 +1,9 @@
+import { usePrices } from '../hooks/usePrices';
+import PriceCard from '../components/dashboard/PriceCard';
+
 const Dashboard = () => {
+  const { prices, loading } = usePrices();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
@@ -6,16 +11,24 @@ const Dashboard = () => {
         <p className="text-gray-400">Real-time prices from the top 10 cryptocurrencies.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="h-40 glass-card animate-pulse flex items-center justify-center text-gray-500 border border-white/5">
-          Loading live prices...
-        </div>
-        <div className="h-40 glass-card animate-pulse flex items-center justify-center text-gray-500 border border-white/5">
-          Loading live prices...
-        </div>
-        <div className="h-40 glass-card animate-pulse flex items-center justify-center text-gray-500 border border-white/5">
-          Loading live prices...
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {loading ? (
+          // Skeleton loader while initial data is fetching
+          Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="h-40 glass-card animate-pulse border border-white/5" />
+          ))
+        ) : (
+          Object.keys(prices).map((coinId) => (
+            <PriceCard
+              key={coinId}
+              coinId={coinId}
+              price={prices[coinId].usd}
+              change24h={prices[coinId].change24h}
+              sparkline={prices[coinId].sparkline}
+              lastUpdated={prices[coinId].lastUpdated}
+            />
+          ))
+        )}
       </div>
     </div>
   );
