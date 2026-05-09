@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { prisma } from './lib/prisma.js';
 import { cacheService } from './services/cacheService.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Simple logging middleware
 app.use((req, res, next) => {

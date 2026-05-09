@@ -1,6 +1,9 @@
-import { Search, User, ChevronDown } from 'lucide-react';
+import { Search, User } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const Header = () => {
+  const { user } = useAuth();
+
   return (
     <header className="h-16 border-b border-white/5 px-8 flex items-center justify-between sticky top-0 bg-background/50 backdrop-blur-md z-40">
       <div className="relative w-96 group">
@@ -15,13 +18,12 @@ const Header = () => {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3 pl-4 border-l border-white/10">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium text-white">Sahitya Naik</p>
-            <p className="text-xs text-gray-500">Pro Investor</p>
+            <p className="text-sm font-medium text-white">{user?.name || 'User'}</p>
+            <p className="text-xs text-gray-500">{user?.email}</p>
           </div>
-          <button className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center border border-white/10 transition-all">
+          <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
             <User className="w-5 h-5 text-gray-400" />
-          </button>
-          <ChevronDown className="w-4 h-4 text-gray-500 cursor-pointer" />
+          </div>
         </div>
       </div>
     </header>

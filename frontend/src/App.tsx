@@ -1,19 +1,58 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   return (
-    <Router>
-      <MainLayout>
+    <AuthProvider>
+      <Router>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/portfolio" element={<div className="text-white text-2xl font-bold">Portfolio Feature (Phase 5)</div>} />
-          <Route path="/alerts" element={<div className="text-white text-2xl font-bold">Alerts Feature (Phase 5)</div>} />
-          <Route path="/analytics" element={<div className="text-white text-2xl font-bold">Analytics Feature (Phase 6)</div>} />
+          {/* Auth Routes (Public) */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Private Routes */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/portfolio" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <div className="text-white text-2xl font-bold">Portfolio Feature (Phase 6)</div>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/alerts" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <div className="text-white text-2xl font-bold">Alerts Feature (Phase 7)</div>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <MainLayout>
+                <div className="text-white text-2xl font-bold">Analytics Feature (Phase 8)</div>
+              </MainLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Catch all - Redirect to dashboard */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </MainLayout>
-    </Router>
+      </Router>
+    </AuthProvider>
   );
 }
 

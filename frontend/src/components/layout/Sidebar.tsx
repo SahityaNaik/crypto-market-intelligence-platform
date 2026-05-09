@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -10,6 +11,8 @@ import {
 import { Link, useLocation } from 'react-router-dom';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useAuth } from '../../context/AuthContext';
+import Modal from '../ui/Modal';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -24,6 +27,8 @@ const navItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const { logout } = useAuth();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <aside className="w-64 h-screen glass-sidebar flex flex-col fixed left-0 top-0 z-50">
@@ -65,11 +70,41 @@ const Sidebar = () => {
           <Settings className="w-5 h-5" />
           <span className="font-medium">Settings</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-danger/80 hover:text-danger hover:bg-danger/5 rounded-lg transition-all">
+        <button 
+          onClick={() => setIsLogoutModalOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-3 text-danger/80 hover:text-danger hover:bg-danger/5 rounded-lg transition-all"
+        >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
         </button>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <Modal 
+        isOpen={isLogoutModalOpen} 
+        onClose={() => setIsLogoutModalOpen(false)} 
+        title="Confirm Logout"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-400 leading-relaxed">
+            Are you sure you want to log out?
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsLogoutModalOpen(false)}
+              className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl border border-white/10 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={logout}
+              className="flex-1 px-4 py-3 bg-danger hover:bg-danger/80 text-white font-bold rounded-xl transition-all shadow-lg shadow-danger/20"
+            >
+              Yes, Logout
+            </button>
+          </div>
+        </div>
+      </Modal>
     </aside>
   );
 };
