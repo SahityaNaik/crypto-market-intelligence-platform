@@ -37,6 +37,8 @@ const PriceCard: React.FC<PriceCardProps> = ({ coinId, price, change24h, sparkli
   const chartData = sparkline?.map((val, i) => ({ value: val, index: i })) || [];
   const isTrendUp = change24h >= 0;
 
+  if (price === null || price === undefined) return null;
+
   return (
     <div className={cn(
       "glass-card p-6 border transition-all duration-1000 min-h-[220px] flex flex-col group",

@@ -156,6 +156,60 @@ app.get('/api/prices/history/:coinId', async (req, res: any) => {
   }
 });
 
+// 4. Get correlations between all coins
+app.get('/api/prices/correlations', async (req, res: any) => {
+  try {
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const history = await prisma.priceHistory.findMany({
+      where: { timestamp: { gte: twentyFourHoursAgo } },
+      orderBy: { timestamp: 'asc' }
+    });
+
+    const coinIds = [...new Set(history.map(h => h.coinId))];
+    const dataByCoin: { [id: string]: number[] } = {};
+    
+    // Group prices
+    coinIds.forEach(id => {
+      dataByCoin[id] = history.filter(h => h.coinId === id).map(h => h.price);
+    });
+
+    const matrix: any[] = [];
+    
+    coinIds.forEach(id1 => {
+      const row: any = { coin: id1 };
+      coinIds.forEach(id2 => {
+        const prices1 = dataByCoin[id1];
+        const prices2 = dataByCoin[id2];
+        
+        const minLen = Math.min(prices1.length, prices2.length);
+        if (minLen < 2) {
+          row[id2] = 1;
+          return;
+        }
+
+        const p1 = prices1.slice(0, minLen);
+        const p2 = prices2.slice(0, minLen);
+        
+        const sum1 = p1.reduce((a, b) => a + b, 0);
+        const sum2 = p2.reduce((a, b) => a + b, 0);
+        const sum1Sq = p1.reduce((a, b) => a + (b * b), 0);
+        const sum2Sq = p2.reduce((a, b) => a + (b * b), 0);
+        const pSum = p1.reduce((acc, val, i) => acc + (val * p2[i]), 0);
+        
+        const num = pSum - (sum1 * sum2 / minLen);
+        const den = Math.sqrt((sum1Sq - (sum1 * sum1) / minLen) * (sum2Sq - (sum2 * sum2) / minLen));
+        
+        row[id2] = den === 0 ? 0 : parseFloat((num / den).toFixed(2));
+      });
+      matrix.push(row);
+    });
+
+    res.status(200).json(matrix);
+  } catch (error: any) {
+    res.status(500).json({ error: 'Failed to calculate correlations' });
+  }
+});
+
 // Start the HTTP server instead of the app
 httpServer.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
