@@ -64,10 +64,6 @@ cron.schedule('*/10 * * * * *', async () => {
     // Emit the prices (including sparkline and 24h change) to the server via Socket.io
     socket.emit('workerUpdate', data);
   } catch (error: any) {
-    if (error.response && error.response.status === 429) {
-      console.log(`[Market Data] Rate limit reached. Will retry in 10s...`);
-    } else {
       console.error('Error fetching from CoinGecko:', error.message);
-    }
   }
 });

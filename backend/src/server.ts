@@ -132,8 +132,25 @@ app.get('/api/prices/history/:coinId', async (req, res: any) => {
         timestamp: 'asc'
       }
     });
+
+    // Calculate detailed stats for the selected period
+    const prices = history.map(h => h.price);
+    const high = prices.length > 0 ? Math.max(...prices) : 0;
+    const low = prices.length > 0 ? Math.min(...prices) : 0;
     
-    res.status(200).json(history);
+    // Calculate Volatility (Standard Deviation)
+    let volatility = 0;
+    if (prices.length > 1) {
+      const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+      const squareDiffs = prices.map(p => Math.pow(p - avg, 2));
+      const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / squareDiffs.length;
+      volatility = (Math.sqrt(avgSquareDiff) / avg) * 100;  
+    }
+    
+    res.status(200).json({
+      history,
+      stats: { high, low, volatility }
+    });
   } catch (error: any) {
     res.status(500).json({ error: 'Failed to fetch history', message: error.message });
   }

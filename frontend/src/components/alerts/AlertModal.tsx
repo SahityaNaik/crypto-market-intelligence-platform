@@ -9,16 +9,27 @@ interface AlertModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialCoin?: string;
 }
 
-const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess, initialCoin }) => {
   const { prices } = usePrices();
   const coinIds = Object.keys(prices);
   
-  const [coinId, setCoinId] = useState('');
+  const [coinId, setCoinId] = useState(initialCoin || '');
   const [condition, setCondition] = useState<'above' | 'below'>('above');
   const [targetPrice, setTargetPrice] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Set initial state when modal opens or initialCoin changes
+  React.useEffect(() => {
+    if (initialCoin) {
+      setCoinId(initialCoin);
+      if (prices[initialCoin]) {
+        setTargetPrice(prices[initialCoin].usd.toString());
+      }
+    }
+  }, [initialCoin, isOpen, prices]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

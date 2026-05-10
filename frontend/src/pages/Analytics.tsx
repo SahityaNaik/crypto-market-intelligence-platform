@@ -10,8 +10,10 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import { usePrices } from '../hooks/usePrices';
-import { BarChart3, TrendingUp, TrendingDown, Clock, Activity } from 'lucide-react';
+import { BarChart3, TrendingUp, TrendingDown, Activity, Bell, ArrowUp, ArrowDown, Zap } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
+import AlertModal from '../components/alerts/AlertModal';
+import { socket } from '../lib/socket';
 
 const Analytics = () => {
   const { prices } = usePrices();
@@ -20,7 +22,9 @@ const Analytics = () => {
   
   const [selectedCoin, setSelectedCoin] = useState(searchParams.get('coin') || 'bitcoin');
   const [history, setHistory] = useState<any[]>([]);
+  const [stats, setStats] = useState({ high: 0, low: 0, volatility: 0 });
   const [loading, setLoading] = useState(true);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   // Sync with URL params if they change
   useEffect(() => {
@@ -34,13 +38,17 @@ const Analytics = () => {
     setLoading(true);
     try {
       const response = await axios.get(`http://localhost:4000/api/prices/history/${id}`);
+      const { history: historyData, stats: statsData } = response.data;
+      
       // Format data for Recharts
-      const formattedData = response.data.map((item: any) => ({
+      const formattedData = historyData.map((item: any) => ({
         time: new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         price: item.price,
         fullTime: new Date(item.timestamp).toLocaleString()
       }));
+      
       setHistory(formattedData);
+      setStats(statsData);
     } catch (error) {
       console.error('Failed to fetch history', error);
     } finally {
@@ -52,6 +60,30 @@ const Analytics = () => {
     if (selectedCoin) {
       fetchHistory(selectedCoin);
     }
+  }, [selectedCoin]);
+
+  // LIVE CHART UPDATES: Listen for new prices and append to chart if it matches current coin
+  useEffect(() => {
+    const handlePriceUpdate = (newPrices: any) => {
+      if (newPrices[selectedCoin]) {
+        const newDataPoint = {
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          price: newPrices[selectedCoin].usd,
+          fullTime: new Date().toLocaleString()
+        };
+        
+        setHistory(prev => {
+          // Keep only last 100 points to prevent chart performance lag
+          const updated = [...prev, newDataPoint];
+          return updated.slice(-100);
+        });
+      }
+    };
+
+    socket.on('priceUpdate', handlePriceUpdate);
+    return () => {
+      socket.off('priceUpdate', handlePriceUpdate);
+    };
   }, [selectedCoin]);
 
   const currentCoinData = prices[selectedCoin];
@@ -78,14 +110,44 @@ const Analytics = () => {
         </div>
       </div>
 
-      {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
-          <p className="text-gray-500 text-sm mb-1">Current Price</p>
+          <p className="text-gray-500 text-sm mb-1 flex items-center gap-2">
+            <Activity className="w-3 h-3" /> Current Price
+          </p>
           <h3 className="text-2xl font-bold text-white">
             ${currentCoinData?.usd?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '0.00'}
           </h3>
         </div>
+        
+        <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
+          <p className="text-gray-500 text-sm mb-1 flex items-center gap-2">
+            <ArrowUp className="w-3 h-3 text-success" /> 24h High
+          </p>
+          <h3 className="text-2xl font-bold text-white">
+            ${stats.high.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </h3>
+        </div>
+
+        <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
+          <p className="text-gray-500 text-sm mb-1 flex items-center gap-2">
+            <ArrowDown className="w-3 h-3 text-danger" /> 24h Low
+          </p>
+          <h3 className="text-2xl font-bold text-white">
+            ${stats.low.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </h3>
+        </div>
+
+        <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
+          <p className="text-gray-500 text-sm mb-1 flex items-center gap-2">
+            <Zap className="w-3 h-3 text-yellow-500" /> Volatility
+          </p>
+          <h3 className="text-2xl font-bold text-white">
+            {stats.volatility.toFixed(4)}%
+          </h3>
+        </div>
+
         <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
           <p className="text-gray-500 text-sm mb-1">24h Change</p>
           <div className="flex items-center gap-2">
@@ -93,20 +155,6 @@ const Analytics = () => {
               {(currentCoinData?.change24h || 0) >= 0 ? '+' : ''}{(currentCoinData?.change24h || 0).toFixed(2)}%
             </h3>
             {(currentCoinData?.change24h || 0) >= 0 ? <TrendingUp className="w-5 h-5 text-success" /> : <TrendingDown className="w-5 h-5 text-danger" />}
-          </div>
-        </div>
-        <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
-          <p className="text-gray-500 text-sm mb-1">Data Points</p>
-          <div className="flex items-center gap-2 text-white">
-            <Activity className="w-5 h-5 text-primary" />
-            <h3 className="text-2xl font-bold">{history.length}</h3>
-          </div>
-        </div>
-        <div className="glass-card p-5 border border-white/5 bg-white/[0.01]">
-          <p className="text-gray-500 text-sm mb-1">Time Range</p>
-          <div className="flex items-center gap-2 text-white">
-            <Clock className="w-5 h-5 text-gray-500" />
-            <h3 className="text-2xl font-bold">24 Hours</h3>
           </div>
         </div>
       </div>
@@ -120,8 +168,21 @@ const Analytics = () => {
             </div>
             <h2 className="text-xl font-bold text-white capitalize">{selectedCoin} Price Action</h2>
           </div>
-          <div className="flex gap-2">
-            <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-full border border-primary/30">REAL-TIME DATA</span>
+          
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsAlertModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-bold rounded-xl border border-primary/20 transition-all text-sm"
+            >
+              <Bell className="w-4 h-4" />
+              Set Alert
+            </button>
+            <div className="flex gap-2">
+              <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-full border border-primary/30 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span>
+                LIVE UPDATES
+              </span>
+            </div>
           </div>
         </div>
 
@@ -133,7 +194,8 @@ const Analytics = () => {
           ) : history.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
               <p className="text-gray-500 max-w-md">
-                No historical data found in database.
+                No historical data found in database. 
+                Keep the worker running to build up price history!
               </p>
             </div>
           ) : (
@@ -153,7 +215,7 @@ const Analytics = () => {
                   tickLine={false} 
                   axisLine={false}
                   interval="preserveStartEnd"
-                  minTickGap={30}
+                  minTickGap={40}
                 />
                 <YAxis 
                   stroke="#6b7280" 
@@ -182,13 +244,21 @@ const Analytics = () => {
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorPrice)" 
-                  animationDuration={1500}
+                  animationDuration={0}
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
+
+      <AlertModal 
+        isOpen={isAlertModalOpen}
+        onClose={() => setIsAlertModalOpen(false)}
+        initialCoin={selectedCoin}
+        onSuccess={() => {}}
+      />
     </div>
   );
 };
