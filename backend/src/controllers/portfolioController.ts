@@ -57,3 +57,19 @@ export const getPortfolio = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const removePosition = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId!;
+
+    await prisma.portfolioPosition.deleteMany({
+      where: { id: id as string, userId }
+    });
+
+    res.json({ message: 'Position removed successfully' });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

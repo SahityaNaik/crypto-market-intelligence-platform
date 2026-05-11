@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Portfolio from './pages/Portfolio';
 import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
+import CoinDetail from './pages/CoinDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -52,52 +53,60 @@ const NotificationHandler = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <NotificationHandler />
-      <Toaster />
-      <Router>
-        <Routes>
-          {/* Auth Routes (Public) */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <AuthProvider>
+        <NotificationHandler />
+        <Toaster />
+        <Router>
+          <Routes>
+            {/* Auth Routes (Public) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Private Routes */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <Dashboard />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/portfolio" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <Portfolio />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+            {/* Private Routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Dashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
 
-          <Route path="/alerts" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <Alerts />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
-          <Route path="/analytics" element={
-            <ProtectedRoute>
-              <MainLayout>
-                <Analytics />
-              </MainLayout>
-            </ProtectedRoute>
-          } />
+            <Route path="/coin/:coinId" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <CoinDetail />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/portfolio" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Portfolio />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
 
-          {/* Catch all - Redirect to dashboard */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+            <Route path="/alerts" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Alerts />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Analytics />
+                </MainLayout>
+              </ProtectedRoute>
+            } />
+
+            {/* Catch all - Redirect to dashboard */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -6,7 +6,8 @@ import {
   BarChart3, 
   Settings, 
   LogOut,
-  TrendingUp
+  TrendingUp,
+  Activity
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { clsx, type ClassValue } from 'clsx';
@@ -20,9 +21,10 @@ function cn(...inputs: ClassValue[]) {
 
 const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { name: 'Portfolio', icon: Wallet, path: '/portfolio' },
-  { name: 'Alerts', icon: Bell, path: '/alerts' },
-  { name: 'Analytics', icon: BarChart3, path: '/analytics' },
+  { name: 'Detailed Coin View', icon: Activity, path: '/coin/bitcoin' },
+  { name: 'Portfolio Tracker', icon: Wallet, path: '/portfolio' },
+  { name: 'Price Alerts', icon: Bell, path: '/alerts' },
+  { name: 'Analytics Dashboard', icon: BarChart3, path: '/analytics' },
 ];
 
 const Sidebar = () => {

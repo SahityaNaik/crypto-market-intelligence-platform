@@ -1,10 +1,9 @@
 import { usePrices } from '../hooks/usePrices';
 import PriceCard from '../components/dashboard/PriceCard';
-import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const { prices, loading } = usePrices();
-  const navigate = useNavigate();
+
 
   return (
     <div className="space-y-6">
@@ -21,19 +20,14 @@ const Dashboard = () => {
           ))
         ) : (
           Object.keys(prices).map((coinId) => (
-            <div 
-              key={coinId} 
-              onClick={() => navigate(`/analytics?coin=${coinId}`)}
-              className="cursor-pointer transition-transform hover:-translate-y-1 active:scale-95"
-            >
-              <PriceCard
-                coinId={coinId}
-                price={prices[coinId].usd}
-                change24h={prices[coinId].change24h}
-                sparkline={prices[coinId].sparkline}
-                lastUpdated={prices[coinId].lastUpdated}
-              />
-            </div>
+            <PriceCard
+              key={coinId}
+              coinId={coinId}
+              price={prices[coinId].usd}
+              change24h={prices[coinId].change24h}
+              sparkline={prices[coinId].sparkline}
+              lastUpdated={prices[coinId].lastUpdated}
+            />
           ))
         )}
       </div>
