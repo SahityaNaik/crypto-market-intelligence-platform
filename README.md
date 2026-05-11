@@ -4,7 +4,7 @@
 A real-time cryptocurrency dashboard that tracks live market prices, manages personal portfolios, and triggers price alerts. The platform uses a background worker to fetch data from CoinGecko and broadcasts updates to users via WebSockets for a live, interactive experience.
 
 ## 📺 Video Walkthrough
-[INSERT YOUR LOOM/YOUTUBE LINK HERE]
+[Project Demo here](https://drive.google.com/file/d/1jQz9QNvNgkANBqVTd0Xe6PEPmlPoJ3Qz/view?usp=sharing)
 
 ---
 
@@ -52,7 +52,7 @@ For more details, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 ### Installation & Startup
 1. **Clone the repository:**
    ```bash
-   git clone [your-repo-url]
+   git clone https://github.com/SahityaNaik/crypto-market-intelligence-platform
    cd crypto-market-intelligence-platform
    ```
 
