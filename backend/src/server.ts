@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -93,7 +94,25 @@ app.get('/api/admin/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'API Server is running with WebSockets' });
 });
 
-httpServer.listen(PORT, () => {
+// Create demo user if not exists
+const ensureDemoUser = async () => {
+  const demoEmail = 'demo@kuvaka.io';
+  const user = await prisma.user.findUnique({ where: { email: demoEmail } });
+  if (!user) {
+    const hashedPassword = await bcrypt.hash('demo123', 10);
+    await prisma.user.create({
+      data: {
+        email: demoEmail,
+        password: hashedPassword,
+        name: 'Kuvaka Demo User'
+      }
+    });
+    console.log('✅ Demo user ready: demo@kuvaka.io');
+  }
+};
+
+httpServer.listen(PORT, async () => {
+  await ensureDemoUser();
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`API Documentation available at http://localhost:${PORT}/api-docs`);
 });

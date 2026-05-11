@@ -32,7 +32,7 @@ async function main() {
   const priceHistoryCount = await prisma.priceHistory.count();
   if (priceHistoryCount === 0) {
     console.log('📊 Generating sample price history for the dashboard...');
-    
+
     for (const coinId of coinIds) {
       // Set a realistic base price
       let basePrice = 100;
@@ -45,8 +45,8 @@ async function main() {
       for (let i = 24; i >= 0; i--) {
         const timestamp = new Date(Date.now() - i * 60 * 60 * 1000);
         // Add some random price movement (+/- 3%)
-        const randomVariation = 1 + (Math.random() * 0.06 - 0.03); 
-        
+        const randomVariation = 1 + (Math.random() * 0.06 - 0.03);
+
         await prisma.priceHistory.create({
           data: {
             coinId,
@@ -63,7 +63,7 @@ async function main() {
   const portfolioCount = await prisma.portfolioPosition.count({ where: { userId: demoUser.id } });
   if (portfolioCount === 0) {
     console.log('💼 Adding sample portfolio for demo account...');
-    
+
     const samplePositions = [
       { coinId: 'bitcoin', quantity: 0.5, purchasePrice: 62000 },
       { coinId: 'ethereum', quantity: 5, purchasePrice: 3200 },

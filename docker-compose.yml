@@ -27,7 +27,7 @@ services:
     depends_on:
       - postgres
     # Run migrations, seed the database, then start the server
-    command: sh -c "npx prisma migrate deploy && npm run seed && npm run dev:server"
+    command: sh -c "npx prisma migrate deploy && npm run dev:server"
 
   worker:
     build: ./backend
@@ -35,6 +35,7 @@ services:
     restart: always
     environment:
       - DATABASE_URL=postgresql://postgres:password123@postgres:5432/crypto_platform
+      - SOCKET_URL=http://api:4000
     depends_on:
       - api
     command: npm run dev:worker

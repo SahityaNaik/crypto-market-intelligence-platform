@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 dotenv.config();
 
 // Connect to our backend server via Socket.io
-const socket = io('http://localhost:4000');
+const socket = io(process.env.SOCKET_URL || 'http://localhost:4000');
 
 socket.on('connect', () => {
   console.log('Worker connected to Socket.io server');
