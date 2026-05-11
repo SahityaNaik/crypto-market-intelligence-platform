@@ -14,5 +14,41 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  api:
+    build: ./backend
+    container_name: crypto_api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/crypto_platform
+      - JWT_SECRET=df7a2c686e5e483e8b4e72c8a123f4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1
+      - PORT=4000
+    depends_on:
+      - postgres
+    # Run migrations, seed the database, then start the server
+    command: sh -c "npx prisma migrate deploy && npm run seed && npm run dev:server"
+
+  worker:
+    build: ./backend
+    container_name: crypto_worker
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/crypto_platform
+    depends_on:
+      - api
+    command: npm run dev:worker
+
+  frontend:
+    build: ./frontend
+    container_name: crypto_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:4000/api
+    depends_on:
+      - api
+
 volumes:
   pgdata:

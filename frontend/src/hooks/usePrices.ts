@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../lib/api';
+
 import { socket } from '../lib/socket';
 
 export interface PriceInfo {
@@ -21,7 +23,7 @@ export const usePrices = () => {
     // 1. Initial fetch from the REST API cache
     const fetchInitialPrices = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/prices/live');
+        const response = await api.get('/prices/live');
         setPrices(response.data);
         setLoading(false);
       } catch (err) {

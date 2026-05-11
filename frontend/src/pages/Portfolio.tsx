@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
+
 import { usePrices } from '../hooks/usePrices';
 import TradeModal from '../components/portfolio/TradeModal';
 import { 
@@ -32,7 +33,7 @@ const Portfolio = () => {
 
   const fetchPortfolio = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/portfolio');
+      const response = await api.get('/portfolio');
       setPositions(response.data);
     } catch (error) {
       console.error('Failed to fetch portfolio', error);

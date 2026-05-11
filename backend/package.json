@@ -6,6 +6,7 @@
   "scripts": {
     "dev:server": "tsx watch src/server.ts",
     "dev:worker": "tsx watch src/worker/coingeckoWorker.ts",
+    "seed": "tsx src/scripts/seed.ts",
     "test": "vitest run"
   },
   "keywords": [],

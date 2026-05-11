@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
+
 import { 
   BarChart,
   Bar,
@@ -20,7 +21,7 @@ const Analytics = () => {
 
   const fetchCorrelations = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/prices/correlations');
+      const response = await api.get('/prices/correlations');
       setCorrelations(response.data);
     } catch (error) {
       console.error('Failed to fetch correlations', error);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
+
 import { Bell, Plus, Trash2, ArrowUp, ArrowDown, Clock, CheckCircle2 } from 'lucide-react';
 import AlertModal from '../components/alerts/AlertModal';
 import toast from 'react-hot-toast';
@@ -21,7 +22,7 @@ const Alerts = () => {
 
   const fetchAlerts = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/alerts');
+      const response = await api.get('/alerts');
       setAlerts(response.data);
     } catch (error) {
       console.error('Failed to fetch alerts', error);
@@ -32,7 +33,7 @@ const Alerts = () => {
 
   const deleteAlert = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:4000/api/alerts/${id}`);
+      await api.delete(`/alerts/${id}`);
       toast.success('Alert removed');
       setAlerts(alerts.filter(a => a.id !== id));
     } catch (error) {

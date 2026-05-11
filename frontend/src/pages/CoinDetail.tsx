@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
+
 import { 
   AreaChart, 
   Area, 
@@ -34,7 +35,7 @@ const CoinDetail = () => {
   const fetchHistory = async (id: string) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:4000/api/prices/history/${id}`);
+      const response = await api.get(`/prices/history/${id}`);
       const { history: historyData, stats: statsData } = response.data;
       
       const formattedData = historyData.map((item: any) => ({

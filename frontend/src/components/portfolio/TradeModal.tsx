@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../lib/api';
+
 import Modal from '../ui/Modal';
 import { usePrices } from '../../hooks/usePrices';
 import { Wallet, DollarSign, PieChart, Loader2 } from 'lucide-react';
@@ -25,7 +26,7 @@ const TradeModal: React.FC<TradeModalProps> = ({ isOpen, onClose, onSuccess }) =
     setError('');
 
     try {
-      await axios.post('http://localhost:4000/api/portfolio/positions', {
+      await api.post('/portfolio/positions', {
         coinId,
         quantity: parseFloat(quantity),
         purchasePrice: parseFloat(purchasePrice)

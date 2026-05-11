@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../lib/api';
+
 import Modal from '../ui/Modal';
 import { usePrices } from '../../hooks/usePrices';
 import { Bell, ArrowUp, ArrowDown, DollarSign, Loader2 } from 'lucide-react';
@@ -36,7 +37,7 @@ const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess, ini
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:4000/api/alerts', {
+      await api.post('/alerts', {
         coinId,
         condition,
         targetPrice: parseFloat(targetPrice)
