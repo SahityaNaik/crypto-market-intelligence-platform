@@ -3,9 +3,6 @@
 ## Overview
 A real-time cryptocurrency dashboard that tracks live market prices, manages personal portfolios, and triggers price alerts. The platform uses a background worker to fetch data from CoinGecko and broadcasts updates to users via WebSockets for a live, interactive experience.
 
-## 📺 Video Walkthrough
-[Project Demo here](https://drive.google.com/file/d/1jQz9QNvNgkANBqVTd0Xe6PEPmlPoJ3Qz/view?usp=sharing)
-
 ---
 
 ## 🛠️ Tech Stack & Justification
