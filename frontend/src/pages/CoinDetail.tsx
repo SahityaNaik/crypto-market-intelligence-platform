@@ -230,7 +230,7 @@ const CoinDetail = () => {
                   }}
                   itemStyle={{ color: '#8b5cf6' }}
                   labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
-                  labelFormatter={(label, payload) => payload[0]?.payload.fullTime}
+                  labelFormatter={(_, payload) => payload[0]?.payload.fullTime}
                 />
                 <Area 
                   type="monotone" 

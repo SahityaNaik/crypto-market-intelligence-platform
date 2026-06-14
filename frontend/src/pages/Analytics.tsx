@@ -84,7 +84,7 @@ const Analytics = () => {
                   formatter={(value: any) => [`${value.toFixed(2)}%`, 'Volatility']}
                 />
                 <Bar dataKey="volatility" radius={[0, 4, 4, 0]} barSize={20}>
-                  {volatilityData.map((entry, index) => (
+                  {volatilityData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={'#374151'} />
                   ))}
                 </Bar>

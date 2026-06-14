@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { TrendingUp, TrendingDown, Clock, ArrowRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, YAxis } from 'recharts';
 import { Link } from 'react-router-dom';
 import { clsx, type ClassValue } from 'clsx';

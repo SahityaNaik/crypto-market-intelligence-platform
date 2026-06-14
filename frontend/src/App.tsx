@@ -21,7 +21,7 @@ const NotificationHandler = () => {
 
     const eventName = `alertTriggered:${user.id}`;
     socket.on(eventName, (data: any) => {
-      toast((t) => (
+      toast(() => (
         <div className="flex flex-col gap-1">
           <div className="font-bold text-white flex items-center gap-2">
             🚨 Price Alert: {data.coinId.toUpperCase()}
