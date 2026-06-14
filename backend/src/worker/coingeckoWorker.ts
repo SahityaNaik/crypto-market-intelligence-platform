@@ -1,4 +1,5 @@
 import axios from 'axios';
+import express from 'express';
 import { prisma } from '../lib/prisma.js';
 import dotenv from 'dotenv';
 import { io } from 'socket.io-client';
@@ -93,3 +94,16 @@ async function fetchAndProcess() {
 
 console.log('Worker started. Fetching with intelligent backoff...');
 fetchAndProcess();
+
+// --- DUMMY SERVER FOR RENDER DEPLOYMENT ---
+ 
+const app = express();
+const PORT = process.env.PORT || 4001;
+
+app.get('/', (req, res) => {
+  res.status(200).send('Worker is alive and polling in the background!');
+});
+
+app.listen(PORT, () => {
+  console.log(`[Worker Dummy Server] Listening on port ${PORT} for Render deployment`);
+});
