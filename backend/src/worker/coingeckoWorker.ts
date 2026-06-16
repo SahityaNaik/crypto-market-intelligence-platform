@@ -95,6 +95,29 @@ async function fetchAndProcess() {
 console.log('Worker started. Fetching with intelligent backoff...');
 fetchAndProcess();
 
+// --- DATABASE CLEANUP ROUTINE ---
+// Run cleanup every 1 hour (3600000 ms)
+setInterval(async () => {
+  try {
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    const deleted = await prisma.priceHistory.deleteMany({
+      where: {
+        timestamp: {
+          lt: twoWeeksAgo
+        }
+      }
+    });
+
+    if (deleted.count > 0) {
+      console.log(`[Cleanup] Successfully deleted ${deleted.count} records older than 14 days.`);
+    }
+  } catch (error) {
+    console.error('[Cleanup] Failed to delete old records:', error);
+  }
+}, 3600000);
+
 // --- DUMMY SERVER FOR RENDER DEPLOYMENT ---
  
 const app = express();
