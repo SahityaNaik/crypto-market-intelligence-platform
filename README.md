@@ -68,12 +68,6 @@ For more details, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
 
-## 🔑 Demo Credentials
-- **Email:** `demo@kuvaka.io`
-- **Password:** `demo123`
-
----
-
 ## 🧪 Testing
 The project includes 10+ unit and integration tests covering critical paths such as authentication, alert triggering, and portfolio calculations.
 ```bash
