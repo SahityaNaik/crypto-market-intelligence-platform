@@ -16,7 +16,7 @@ interface AlertModalProps {
 const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess, initialCoin }) => {
   const { prices } = usePrices();
   const coinIds = Object.keys(prices);
-  
+
   const [coinId, setCoinId] = useState(initialCoin || '');
   const [condition, setCondition] = useState<'above' | 'below'>('above');
   const [targetPrice, setTargetPrice] = useState('');
@@ -37,12 +37,37 @@ const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess, ini
     setLoading(true);
 
     try {
-      await api.post('/alerts', {
+      const response = await api.post('/alerts', {
         coinId,
         condition,
         targetPrice: parseFloat(targetPrice)
       });
-      toast.success(`Alert set for ${coinId.toUpperCase()}!`);
+      
+      if (response.data.isTriggeredInstantly) {
+        toast(() => (
+          <div className="flex flex-col gap-1">
+            <div className="font-bold text-white flex items-center gap-2">
+              🚨 Price Alert: {coinId.toUpperCase()}
+            </div>
+            <div className="text-sm text-gray-400">
+              Price is now {condition} ${parseFloat(targetPrice).toLocaleString()}!
+              (Current: ${response.data.currentPrice?.toLocaleString()})
+            </div>
+          </div>
+        ), {
+          duration: 8000,
+          position: 'top-right',
+          style: {
+            background: '#1a1b1e',
+            color: '#fff',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '12px',
+          }
+        });
+      } else {
+        toast.success(`Alert set for ${coinId.toUpperCase()}!`);
+      }
+      
       onSuccess();
       onClose();
       // Reset
@@ -89,11 +114,10 @@ const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess, ini
             <button
               type="button"
               onClick={() => setCondition('above')}
-              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
-                condition === 'above' 
-                  ? 'bg-success/10 border-success text-success font-bold' 
-                  : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
-              }`}
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${condition === 'above'
+                ? 'bg-success/10 border-success text-success font-bold'
+                : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                }`}
             >
               <ArrowUp className="w-4 h-4" />
               Price Above
@@ -101,11 +125,10 @@ const AlertModal: React.FC<AlertModalProps> = ({ isOpen, onClose, onSuccess, ini
             <button
               type="button"
               onClick={() => setCondition('below')}
-              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${
-                condition === 'below' 
-                  ? 'bg-danger/10 border-danger text-danger font-bold' 
-                  : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
-              }`}
+              className={`flex items-center justify-center gap-2 py-3 rounded-xl border transition-all ${condition === 'below'
+                ? 'bg-danger/10 border-danger text-danger font-bold'
+                : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                }`}
             >
               <ArrowDown className="w-4 h-4" />
               Price Below
