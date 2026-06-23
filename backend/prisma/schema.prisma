@@ -12,6 +12,8 @@ model User {
   password  String
   name      String?
   createdAt DateTime @default(now())
+  resetToken       String?
+  resetTokenExpiry DateTime?
   alerts    Alert[]
   portfolio PortfolioPosition[]
 }
